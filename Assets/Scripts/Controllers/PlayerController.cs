@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,15 +9,36 @@ public class PlayerController : MonoBehaviour
     float _speed = 10.0f,
           _yAngle;
 
+    bool _moveToDest = false;
+    Vector3 _destPos;
+
     void Start()
     {
         Manager.Input.KeyAction -= OnKeyboard;
         Manager.Input.KeyAction += OnKeyboard;
+        Manager.Input.MouseAction -= OnMouseClicked;
+        Manager.Input.MouseAction += OnMouseClicked;
+
     }
 
     void Update()
     {
+        if(_moveToDest)
+        {
+            Vector3 dir = _destPos - transform.position;
+            if(dir.magnitude < 0.001f)
+            {
+                _moveToDest = false;
+            }
+            else
+            {
+                float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+                transform.position += dir.normalized * moveDist;
 
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 10 * Time.deltaTime);
+                transform.LookAt(_destPos);
+            }
+        }
     }
 
     void OnKeyboard()
@@ -55,6 +77,25 @@ public class PlayerController : MonoBehaviour
         // transform.Rotate(new Vector3(0, Time.deltaTime * 100f, 0));
 
         //transform.rotation = Quaternion.Euler(new Vector3(0, _yAngle, 0));
+        _moveToDest = false;
+    }
 
+    private void OnMouseClicked(Define.MouseEvent evt)
+    {
+        if (evt != Define.MouseEvent.Click)
+            return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
+        //int mask = (1 << 8) | (1 << 9);
+        //LayerMask mask = LayerMask.GetMask("Monster") | LayerMask.GetMask("Wall");
+
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall")))
+        {
+            _destPos = hit.point;
+            _moveToDest = true;
+            //Debug.Log($"Raucast Camera {hit.collider.gameObject.name}");
+        }
     }
 }
