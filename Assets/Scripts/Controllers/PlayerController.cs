@@ -6,84 +6,50 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    float _speed = 10.0f,
-          _yAngle;
+    float _speed = 10.0f;
 
-    bool _moveToDest = false;
+    //bool _moveToDest = false;
     Vector3 _destPos;
+    Animator ani;
+    public enum PlayerState
+    {
+        Die,
+        Moving,
+        Idle
+    }
+    PlayerState _state = PlayerState.Idle;
 
     void Start()
     {
-        Manager.Input.KeyAction -= OnKeyboard;
-        Manager.Input.KeyAction += OnKeyboard;
+        ani = GetComponent<Animator>();
+        //Manager.Input.KeyAction -= OnKeyboard;
+        //Manager.Input.KeyAction += OnKeyboard;
         Manager.Input.MouseAction -= OnMouseClicked;
         Manager.Input.MouseAction += OnMouseClicked;
-
     }
 
     void Update()
     {
-        if(_moveToDest)
+        switch(_state)
         {
-            Vector3 dir = _destPos - transform.position;
-            if(dir.magnitude < 0.001f)
-            {
-                _moveToDest = false;
-            }
-            else
-            {
-                float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
-                transform.position += dir.normalized * moveDist;
-
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 10 * Time.deltaTime);
-                transform.LookAt(_destPos);
-            }
+            case PlayerState.Die:
+                UpdateDie();
+                break;
+            case PlayerState.Moving:
+                UpdateMoving();
+                break;
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
         }
-    }
-
-    void OnKeyboard()
-    {
-        // Local -> World
-        // TransformDirection
-        // World -> Local
-        // InverseTransformDirection
-
-        if (Input.GetKey(KeyCode.W))
-        {
-            //특정 방향으로 쳐다보기
-            //transform.rotation = Quaternion.LookRotation(Vector3.forward);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.5f);
-            //transform.position += transform.TransformDirection(Vector3.forward * Time.deltaTime * _speed);
-            transform.Translate(Vector3.forward * Time.deltaTime * _speed);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.5f);
-            transform.Translate(Vector3.forward * Time.deltaTime * _speed);
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.5f);
-            transform.Translate(Vector3.forward * Time.deltaTime * _speed);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.5f);
-            transform.Translate(Vector3.forward * Time.deltaTime * _speed);
-        }
-
-        _yAngle += Time.deltaTime * 100f;
-        // transform.eulerAngles = new Vector3(0, _yAngle, 0);
-        // transform.Rotate(new Vector3(0, Time.deltaTime * 100f, 0));
-
-        //transform.rotation = Quaternion.Euler(new Vector3(0, _yAngle, 0));
-        _moveToDest = false;
     }
 
     private void OnMouseClicked(Define.MouseEvent evt)
     {
-        if (evt != Define.MouseEvent.Click)
+        if (_state == PlayerState.Die)
             return;
+        //if (evt != Define.MouseEvent.Click)
+        //    return;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
@@ -94,8 +60,109 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall")))
         {
             _destPos = hit.point;
-            _moveToDest = true;
+            //_moveToDest = true;
+            _state = PlayerState.Moving;
             //Debug.Log($"Raucast Camera {hit.collider.gameObject.name}");
         }
     }
+    void UpdateDie()
+    {
+
+    }
+    void UpdateMoving()
+    {
+        Vector3 dir = _destPos - transform.position;
+        if (dir.magnitude < 0.001f)
+        {
+            _state = PlayerState.Idle;
+        }
+        else
+        {
+            float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+            transform.position += dir.normalized * moveDist;
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+            //transform.LookAt(_destPos);
+        }
+        //현재 게임 상태에 대한 정보를 넘겨줌
+        ani.SetFloat("speed", _speed);
+    }
+    void UpdateIdle()
+    {
+        ani.SetFloat("speed", 0);
+    }
+    
+    #region 버림
+    //void Update_01()
+    //{
+    //    //if(_moveToDest)
+    //    //{
+    //    //    Vector3 dir = _destPos - transform.position;
+    //    //    if(dir.magnitude < 0.001f)
+    //    //    {
+    //    //        _moveToDest = false;
+    //    //    }
+    //    //    else
+    //    //    {
+    //    //        float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+    //    //        transform.position += dir.normalized * moveDist;
+
+    //    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+    //    //        transform.LookAt(_destPos);
+    //    //    }
+    //    //}
+
+    //    //if (_moveToDest)
+    //    //{
+    //    //    wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1, 10.0f * Time.deltaTime);
+    //    //    ani.SetFloat("wait_run_ratio", wait_run_ratio);
+    //    //    ani.Play("Wait_Run");
+    //    //}
+    //    //else
+    //    //{
+    //    //    wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0, 10.0f * Time.deltaTime);
+    //    //    ani.SetFloat("wait_run_ratio", wait_run_ratio);
+    //    //    ani.Play("Wait_Run");
+    //    //}
+    //}
+
+    //void OnKeyboard()
+    //{
+    //    // Local -> World
+    //    // TransformDirection
+    //    // World -> Local
+    //    // InverseTransformDirection
+
+    //    if (Input.GetKey(KeyCode.W))
+    //    {
+    //        //특정 방향으로 쳐다보기
+    //        //transform.rotation = Quaternion.LookRotation(Vector3.forward);
+    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.5f);
+    //        //transform.position += transform.TransformDirection(Vector3.forward * Time.deltaTime * _speed);
+    //        transform.Translate(Vector3.forward * Time.deltaTime * _speed);
+    //    }
+    //    if (Input.GetKey(KeyCode.S))
+    //    {
+    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.5f);
+    //        transform.Translate(Vector3.forward * Time.deltaTime * _speed);
+    //    }
+    //    if (Input.GetKey(KeyCode.A))
+    //    {
+    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.5f);
+    //        transform.Translate(Vector3.forward * Time.deltaTime * _speed);
+    //    }
+    //    if (Input.GetKey(KeyCode.D))
+    //    {
+    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.5f);
+    //        transform.Translate(Vector3.forward * Time.deltaTime * _speed);
+    //    }
+
+    //    //_yAngle += Time.deltaTime * 100f;
+    //    // transform.eulerAngles = new Vector3(0, _yAngle, 0);
+    //    // transform.Rotate(new Vector3(0, Time.deltaTime * 100f, 0));
+
+    //    //transform.rotation = Quaternion.Euler(new Vector3(0, _yAngle, 0));
+    //    //_moveToDest = false;
+    //}
+    #endregion
 }
