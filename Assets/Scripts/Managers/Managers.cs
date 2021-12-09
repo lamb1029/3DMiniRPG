@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Manager : MonoBehaviour
+public class Managers : MonoBehaviour
 {
-    static Manager s_instance;
+    static Managers s_instance;
     //public static Manager GetInstance() { Init(); return s_instance; }
-    static Manager Instance { get { Init(); return s_instance; } }
+    static Managers Instance { get { Init(); return s_instance; } }
 
     InputManager _input = new InputManager();
     ResourceManager _resource = new ResourceManager();
+    UIManager _ui = new UIManager();
     public static InputManager Input { get { return Instance._input; } }
     public static ResourceManager Resource { get { return Instance._resource; } }
+    public static UIManager UI { get { return Instance._ui; } }
 
     void Start()
     {
@@ -27,14 +29,14 @@ public class Manager : MonoBehaviour
     {
         if(s_instance == null)
         {
-            GameObject go = GameObject.Find("Manager");
+            GameObject go = GameObject.Find("@Manager");
             if(go == null)
             {
-                go = new GameObject { name = "Manager" };
-                go.AddComponent<Manager>();
+                go = new GameObject { name = "@Manager" };
+                go.AddComponent<Managers>();
             }
             DontDestroyOnLoad(go);
-            s_instance = go.GetComponent<Manager>();
+            s_instance = go.GetComponent<Managers>();
         }
     }
 }

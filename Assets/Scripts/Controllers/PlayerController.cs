@@ -24,8 +24,10 @@ public class PlayerController : MonoBehaviour
         ani = GetComponent<Animator>();
         //Manager.Input.KeyAction -= OnKeyboard;
         //Manager.Input.KeyAction += OnKeyboard;
-        Manager.Input.MouseAction -= OnMouseClicked;
-        Manager.Input.MouseAction += OnMouseClicked;
+        Managers.Input.MouseAction -= OnMouseClicked;
+        Managers.Input.MouseAction += OnMouseClicked;
+
+        Managers.UI.ShowPopupUI<UI_Button>();
     }
 
     void Update()
