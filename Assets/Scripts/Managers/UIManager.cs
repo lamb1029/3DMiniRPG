@@ -107,4 +107,10 @@ public class UIManager
             canvas.sortingOrder = 0;
         }
     }
+
+    public void Clear()
+    {
+        CloseAllPopupUI();
+        _sceneUI = null;
+    }
 }
