@@ -5,11 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class LoginScene : BaseScene
 {
-    void Start()
-    {
-        Init();
-    }
-
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.Q))
@@ -25,14 +20,14 @@ public class LoginScene : BaseScene
 
         SceneType = Define.Scene.Login;
 
-        List<GameObject> list = new List<GameObject>();
-        for (int i = 0; i < 5; i++)
-            list.Add(Managers.Resource.Instantiate("Player"));
+        //List<GameObject> list = new List<GameObject>();
+        //for (int i = 0; i < 5; i++)
+        //    list.Add(Managers.Resource.Instantiate("Player"));
 
-        foreach (GameObject obj in list)
-        {
-            Managers.Resource.Destroy(obj);
-        }
+        //foreach (GameObject obj in list)
+        //{
+        //    Managers.Resource.Destroy(obj);
+        //}
     }
 
     public override void Clear()

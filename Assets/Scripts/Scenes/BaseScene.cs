@@ -9,7 +9,7 @@ public abstract class BaseScene : MonoBehaviour
 
     void Start()
     {
-        
+        Init();
     }
 
     protected virtual void Init()
