@@ -2,25 +2,26 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    float _speed = 10.0f;
+    PlayerStat _stat;
 
-    //bool _moveToDest = false;
     Vector3 _destPos;
     Animator ani;
     public enum PlayerState
     {
         Die,
         Moving,
-        Idle
+        Idle,
+        Skill
     }
     PlayerState _state = PlayerState.Idle;
 
     void Start()
     {
+        _stat = gameObject.GetComponent<PlayerStat>();
         ani = GetComponent<Animator>();
         //Manager.Input.KeyAction -= OnKeyboard;
         //Manager.Input.KeyAction += OnKeyboard;
@@ -41,9 +42,13 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Idle:
                 UpdateIdle();
                 break;
+            case PlayerState.Skill:
+                break;
+
         }
     }
 
+    int _mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);
     private void OnMouseClicked(Define.MouseEvent evt)
     {
         if (_state == PlayerState.Die)
@@ -52,17 +57,26 @@ public class PlayerController : MonoBehaviour
         //    return;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
+        //Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
         //int mask = (1 << 8) | (1 << 9);
         //LayerMask mask = LayerMask.GetMask("Monster") | LayerMask.GetMask("Wall");
 
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100.0f, LayerMask.GetMask("Wall")))
+        if (Physics.Raycast(ray, out hit, 100.0f, _mask))
         {
             _destPos = hit.point;
             //_moveToDest = true;
             _state = PlayerState.Moving;
             //Debug.Log($"Raucast Camera {hit.collider.gameObject.name}");
+
+            if(hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+            {
+                Debug.Log("Monster Click");
+            }
+            else
+            {
+                Debug.Log("Ground Click");
+            }
         }
     }
     void UpdateDie()
@@ -72,20 +86,32 @@ public class PlayerController : MonoBehaviour
     void UpdateMoving()
     {
         Vector3 dir = _destPos - transform.position;
-        if (dir.magnitude < 0.001f)
+        if (dir.magnitude < 0.1f)
         {
             _state = PlayerState.Idle;
         }
         else
         {
-            float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
-            transform.position += dir.normalized * moveDist;
+            NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
+
+            float moveDist = Mathf.Clamp(_stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+            nma.Move(dir.normalized * moveDist);
+
+            Debug.DrawRay(transform.position + Vector3.up * 0.5f, dir.normalized, Color.green);
+            if(Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1.0f, LayerMask.GetMask("Block")))
+            {
+                _state = PlayerState.Idle;
+                return;
+            }
+
+
+            //transform.position += dir.normalized * moveDist;
 
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
             //transform.LookAt(_destPos);
         }
         //현재 게임 상태에 대한 정보를 넘겨줌
-        ani.SetFloat("speed", _speed);
+        ani.SetFloat("speed", _stat.MoveSpeed);
     }
     void UpdateIdle()
     {
