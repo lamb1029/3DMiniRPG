@@ -602,6 +602,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1240393343, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
+      propertyPath: m_Constraints
+      value: 126
+      objectReference: {fileID: 0}
     - target: {fileID: 5061617855896355116, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
       propertyPath: m_Name
       value: Player
@@ -648,6 +652,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5061617855896591628, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5061617855903789994, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
+      propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

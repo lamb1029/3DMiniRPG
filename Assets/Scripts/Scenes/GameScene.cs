@@ -13,6 +13,10 @@ public class GameScene : BaseScene
         SceneType = Define.Scene.Game;
         Managers.UI.ShowSceneUI<UI_Inven>();
 
+        Dictionary<int, Data.Stat> dict = Managers.Data.StatDict;
+
+        gameObject.GetOrAddComponent<CursorController>();
+
         //for (int i = 0; i < 5; i++)
         //    Managers.Resource.Instantiate("Player");
 
@@ -20,16 +24,6 @@ public class GameScene : BaseScene
 
         //StopCoroutine(co);
     }
-
-    //IEnumerable CoStopExplode(float seconds)
-    //{
-
-    //}
-
-    //IEnumerable ExplodeAfterSecinds(float seconsd)
-    //{
-    //    yield return new WaitForSeconds(seconsd);
-    //}
 
     public override void Clear()
     {
