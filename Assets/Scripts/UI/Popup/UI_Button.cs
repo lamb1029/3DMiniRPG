@@ -25,11 +25,6 @@ public class UI_Button : UI_Popup
         ItemIcon
     }
 
-    void Start()
-    {
-        Init();
-    }
-
     public override void Init()
     {
         base.Init();
