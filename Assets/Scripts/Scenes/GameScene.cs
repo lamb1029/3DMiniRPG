@@ -23,6 +23,11 @@ public class GameScene : BaseScene
         //co = StartCoroutine("ExplodeAfterSecinds", 4.0f);
 
         //StopCoroutine(co);
+
+        GameObject player = Managers.Game.Spawn(Define.WorldObject.Player, "Player");
+        Camera.main.gameObject.GetOrAddComponent<CameraController>().SetPlayer(player);
+        Managers.Game.Spawn(Define.WorldObject.Player, "knight");
+
     }
 
     public override void Clear()

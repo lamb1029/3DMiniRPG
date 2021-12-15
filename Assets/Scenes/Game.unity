@@ -607,6 +607,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5061617855896355116, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5061617855896591628, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -651,8 +655,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 90964139, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c3a3da0dfdd89444b59cc3132c631f6, type: 3}
 --- !u!1 &90964132 stripped
 GameObject:
@@ -13650,11 +13653,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1962586607919907749, guid: acfdaa6849aaa2b4cb5bd1a738e363c1, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.51
       objectReference: {fileID: 0}
     - target: {fileID: 1962586607919907749, guid: acfdaa6849aaa2b4cb5bd1a738e363c1, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3678994900769971615, guid: acfdaa6849aaa2b4cb5bd1a738e363c1, type: 3}
       propertyPath: m_Camera
@@ -13663,6 +13666,10 @@ PrefabInstance:
     - target: {fileID: 6860448945705879415, guid: acfdaa6849aaa2b4cb5bd1a738e363c1, type: 3}
       propertyPath: m_Name
       value: Knight
+      objectReference: {fileID: 0}
+    - target: {fileID: 6860448945705879415, guid: acfdaa6849aaa2b4cb5bd1a738e363c1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6860448945706310487, guid: acfdaa6849aaa2b4cb5bd1a738e363c1, type: 3}
       propertyPath: m_RootOrder
