@@ -41,7 +41,7 @@ public abstract class BaseController : MonoBehaviour
         }
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         Init();
     }
@@ -62,7 +62,6 @@ public abstract class BaseController : MonoBehaviour
             case Define.State.Skill:
                 UpdateSkill();
                 break;
-
         }
     }
 

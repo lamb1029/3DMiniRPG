@@ -13,6 +13,16 @@ public class MonsterController : BaseController
     [SerializeField]
     float _attackRange = 2;
 
+    Vector3 zeropos; //생성될때 처음 위치
+    bool isreturn = false;
+    float area = 30f; //몬스터 영역
+
+    protected override void Start()
+    {
+        base.Start();
+        zeropos = transform.position;
+    }
+
     public override void Init()
     {
         WorldObjectType = Define.WorldObject.Monster;
@@ -25,51 +35,59 @@ public class MonsterController : BaseController
 
     protected override void UpdateIdle()
     {
-        //플레이어 서칭
-        //GameObject player = GameObject.FindGameObjectWithTag("Player");
-        GameObject player = Managers.Game.GetPlayer();
-        if (player == null)
-            return;
-
-        float distance = (player.transform.position - transform.position).magnitude;
-        if(distance <= _scanRange)
+        if(isreturn == false)
         {
-            _lockTarget = player;
-            State = Define.State.Moving;
-            return;
+            //플레이어 서칭
+            //GameObject player = GameObject.FindGameObjectWithTag("Player");
+            GameObject player = Managers.Game.GetPlayer();
+            if (player == null)
+                return;
+
+            float distance = (player.transform.position - transform.position).magnitude;
+            if(distance <= _scanRange)
+            {
+                _lockTarget = player;
+                State = Define.State.Moving;
+                return;
+            }
         }
     }
 
     protected override void UpdateMoving()
     {
-        //플레이어가 사정거리 안에 오면 공격
-        if (_lockTarget != null)
+        if(isreturn == false)
         {
-            _destPos = _lockTarget.transform.position;
-            float distance = (_destPos - transform.position).magnitude;
-            if (distance <= _attackRange)
+            //플레이어가 사정거리 안에 오면 공격
+            if (_lockTarget != null)
+            {
+                _destPos = _lockTarget.transform.position;
+                float distance = (_destPos - transform.position).magnitude;
+                if (distance <= _attackRange)
+                {
+                    NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
+                    nma.SetDestination(transform.position);
+                    State = Define.State.Skill;
+                    return;
+                }
+            }
+
+            //이동
+            Vector3 dir = _destPos - transform.position;
+            if (dir.magnitude < 0.1f)
+            {
+                State = Define.State.Idle;
+            }
+            else
             {
                 NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
-                nma.SetDestination(transform.position);
-                State = Define.State.Skill;
-                return;
+                nma.SetDestination(_destPos);
+                nma.speed = _stat.MoveSpeed;
+
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
             }
         }
-
-        //이동
-        Vector3 dir = _destPos - transform.position;
-        if (dir.magnitude < 0.1f)
-        {
-            State = Define.State.Idle;
-        }
-        else
-        {
-            NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
-            nma.SetDestination(_destPos);
-            nma.speed = _stat.MoveSpeed;
-
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
-        }
+        
+        MonsterReturn();
     }
 
     protected override void UpdateSkill()
@@ -106,5 +124,27 @@ public class MonsterController : BaseController
         {
             State = Define.State.Idle;
         }
+    }
+
+    void MonsterReturn()
+    {
+        NavMeshAgent nma = gameObject.GetOrAddComponent<NavMeshAgent>();
+        float dir = (transform.position - zeropos).magnitude;
+
+        //생성된 자리로 부터 멀어지면 다시 본래 자리로 돌아감
+        if( dir > 35.0f)
+        {
+            isreturn = true;
+            _lockTarget = null;
+            State = Define.State.Moving;
+            nma.SetDestination(zeropos);
+        }
+        //본래 자리로 돌아오면 다시 주변을 서칭
+        if (dir <= 0.1f)
+        {
+            isreturn = false;
+            State = Define.State.Idle;
+        }
+
     }
 }
